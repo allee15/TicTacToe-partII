@@ -9,67 +9,49 @@ import SwiftUI
 
 struct TableScreen: View {
     @State var playerNameTurn: Int = 1
-    @State var icon: ImageResource? = nil
+    @State var icons: [[ImageResource?]] = Array(repeating: Array(repeating: nil, count: 3), count: 3)
+
     var body: some View {
         VStack {
-            Text("It's player's \(playerNameTurn) turn!")
+            Text("It's player \(playerNameTurn)'s turn!")
                 .padding(.vertical, 32)
             
-            ForEach(0..<3) { line in
+            ForEach(0..<3) { row in
                 HStack(spacing: 8) {
                     ForEach(0..<3) { column in
-                        switch playerNameTurn {
-                        case 1:
-                            Button {
-                                self.icon = .icX
-                            } label: {
-                                TableCellView(icon: $icon) {
-                                    self.playerNameTurn = 1
-                                }
-                            }
-                        case 2:
-                            Button {
-                                self.icon = .ic0
-                            } label: {
-                                TableCellView(icon: $icon) {
-                                    self.playerNameTurn = 2
-                                }
-                            }
-                        default:
-                            EmptyView()
+                        Button {
+                            icons[row][column] = playerNameTurn == 1 ? .icX : .ic0
+                            playerNameTurn = playerNameTurn == 1 ? 2 : 1
+                        } label: {
+                            TableCellView(icon: $icons[row][column])
                         }
                     }
                 }
             }
-        }.ignoresSafeArea()
+        }
+        .ignoresSafeArea()
     }
 }
 
 struct TableCellView: View {
     @Binding var icon: ImageResource?
-    let action: () -> ()
     
     var body: some View {
-        Button {
-            action()
-        } label: {
-            if let icon = icon {
-                Image(icon)
-                    .resizable()
-                    .frame(width: 32, height: 32)
-                    .padding(.all, 8)
-                    .border(.mint, width: 2)
-            } else {
-                Rectangle()
-                    .foregroundStyle(.white)
-                    .frame(width: 32, height: 32)
-                    .padding(.all, 8)
-                    .border(.mint, width: 2)
-            }
+        if let icon = icon {
+            Image(icon)
+                .resizable()
+                .frame(width: 32, height: 32)
+                .padding(.all, 8)
+                .border(.mint, width: 2)
+        } else {
+            Rectangle()
+                .foregroundColor(.white)
+                .frame(width: 32, height: 32)
+                .padding(.all, 8)
+                .border(.mint, width: 2)
         }
     }
 }
 
-#Preview {
-    TableScreen()
-}
+
+
